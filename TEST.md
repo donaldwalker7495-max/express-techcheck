@@ -1,4 +1,4 @@
-# Express Starter Project - Candidate Test
+# Express Starter Project - Candidate Check
 
 ## Problem 1: Implement CRUD Operations for a Product Resource
 
