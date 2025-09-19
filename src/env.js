@@ -3,6 +3,11 @@ import { z } from "zod/v4";
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.coerce.number().default(3000),
+  PGHOST: z.string().default("localhost"),
+  PGPORT: z.coerce.number().default(5432),
+  PGDATABASE: z.string().default("express_api"),
+  PGUSER: z.string().default("postgres"),
+  PGPASSWORD: z.string().default("password123"),
 });
 
 try {
