@@ -118,3 +118,79 @@ describe("/api/v1/products CRUD", () => {
 });
 
 
+describe("/api/v1/products search", () => {
+  it("returns 400 when q is missing or invalid", async () => {
+    const missing = await request(app).get("/api/v1/products/search");
+    expect(missing.status).toBe(400);
+
+    const badPageZero = await request(app).get("/api/v1/products/search").query({ q: "abc", page: 0 });
+    expect(badPageZero.status).toBe(400);
+
+    const badPageNaN = await request(app).get("/api/v1/products/search").query({ q: "abc", page: "nope" });
+    expect(badPageNaN.status).toBe(400);
+  });
+
+  it("returns message when no products found", async () => {
+    await request(app).post("/api/v1/products").send({ name: randomString(), description: randomString(20), price: randomPrice() });
+    const res = await request(app).get("/api/v1/products/search").query({ q: "zzzz-no-match" });
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe("No products found");
+    expect(res.body.results).toEqual([]);
+    expect(res.body.page).toBe(1);
+    expect(res.body.pageSize).toBe(10);
+    expect(res.body.total).toBe(0);
+  });
+
+  it("performs case-insensitive substring match and orders by created_at desc", async () => {
+    const a = await request(app).post("/api/v1/products").send({ name: "Laptop Bag", description: randomString(20), price: 50 });
+    const b = await request(app).post("/api/v1/products").send({ name: "lapTOP Stand", description: randomString(20), price: 30 });
+    const c = await request(app).post("/api/v1/products").send({ name: "Phone", description: randomString(20), price: 999 });
+    expect(a.status).toBe(201); expect(b.status).toBe(201); expect(c.status).toBe(201);
+    const res = await request(app).get("/api/v1/products/search").query({ q: "laptop" });
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(2);
+    expect(res.body.results.length).toBe(2);
+    // newest first
+    expect(res.body.results[0].id).toBe(b.body.id);
+    expect(res.body.results[1].id).toBe(a.body.id);
+  });
+
+  it("paginates results with 10 per page", async () => {
+    const createdIds = [];
+    for (let i = 0; i < 15; i++) {
+      const res = await request(app).post("/api/v1/products").send({ name: `Gadget ${i}`, description: randomString(20), price: randomPrice() });
+      expect(res.status).toBe(201);
+      createdIds.push(res.body.id);
+    }
+    const page1 = await request(app).get("/api/v1/products/search").query({ q: "gAdGet", page: 1 });
+    expect(page1.status).toBe(200);
+    expect(page1.body.total).toBe(15);
+    expect(page1.body.page).toBe(1);
+    expect(page1.body.pageSize).toBe(10);
+    expect(page1.body.results.length).toBe(10);
+
+    const page2 = await request(app).get("/api/v1/products/search").query({ q: "gAdGet", page: 2 });
+    expect(page2.status).toBe(200);
+    expect(page2.body.total).toBe(15);
+    expect(page2.body.page).toBe(2);
+    expect(page2.body.results.length).toBe(5);
+  });
+
+  it("escapes SQL LIKE metacharacters % and _", async () => {
+    const p1 = await request(app).post("/api/v1/products").send({ name: "100% Cotton Shirt", description: randomString(20), price: 19.99 });
+    const p2 = await request(app).post("/api/v1/products").send({ name: "Under_score Item", description: randomString(20), price: 9.99 });
+    expect(p1.status).toBe(201); expect(p2.status).toBe(201);
+
+    const s1 = await request(app).get("/api/v1/products/search").query({ q: "%" });
+    expect(s1.status).toBe(200);
+    // Should at least include the item with a literal % in the name
+    expect(s1.body.results.some(r => r.id === p1.body.id)).toBe(true);
+
+    const s2 = await request(app).get("/api/v1/products/search").query({ q: "_" });
+    expect(s2.status).toBe(200);
+    // Should at least include the item with a literal _ in the name
+    expect(s2.body.results.some(r => r.id === p2.body.id)).toBe(true);
+  });
+});
+
+

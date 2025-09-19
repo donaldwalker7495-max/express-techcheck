@@ -37,6 +37,7 @@ export async function migrate() {
       created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_products_created_at ON products(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_products_name_trgm ON products USING GIN (name gin_trgm_ops);
 
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,

@@ -26,6 +26,50 @@ router.get("/", async (_req, res, next) => {
   }
 });
 
+// Escape characters that have special meaning in SQL LIKE patterns
+function escapeLike(input) {
+  return input.replace(/[\\%_]/g, ch => `\\${ch}`);
+}
+
+const searchQuerySchema = z.object({
+  q: z.string().trim().min(1, { message: "Query parameter q is required" }).max(255),
+  page: z.coerce.number().int().min(1).optional().default(1),
+});
+
+// GET /api/v1/products/search?q=...&page=1
+router.get("/search", async (req, res, next) => {
+  try {
+    const { q, page } = searchQuerySchema.parse(req.query);
+    const PAGE_SIZE = 10;
+    const offset = (page - 1) * PAGE_SIZE;
+    const likePattern = `%${escapeLike(q)}%`;
+
+    const totalResult = await query(
+      "SELECT COUNT(*)::int AS count FROM products WHERE name ILIKE $1 ESCAPE '\\'",
+      [likePattern],
+    );
+    const total = totalResult.rows[0]?.count ?? 0;
+
+    if (total === 0) {
+      return res.status(200).json({ message: "No products found", results: [], page, pageSize: PAGE_SIZE, total });
+    }
+
+    const { rows } = await query(
+      "SELECT id, name, description, price::float8 AS price, created_at FROM products WHERE name ILIKE $1 ESCAPE '\\' ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+      [likePattern, PAGE_SIZE, offset],
+    );
+
+    res.json({ results: rows, page, pageSize: PAGE_SIZE, total });
+  }
+  catch (err) {
+    if (err instanceof z.ZodError) {
+      res.status(400);
+      return next(new Error(err.issues.map(i => i.message).join(", ")));
+    }
+    next(err);
+  }
+});
+
 router.get("/:id", async (req, res, next) => {
   try {
     const id = Number(req.params.id);
