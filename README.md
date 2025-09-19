@@ -1,5 +1,3 @@
-# Express Starter Project - Candidate Test
-
 ## Problem 1: Implement CRUD Operations for a Product Resource
 
 **Task**: Create a REST API for managing products. Each product has the following fields:
