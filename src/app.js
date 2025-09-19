@@ -3,6 +3,9 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 
+// Initialize database
+import "./database.js";
+
 import api from "./api/index.js";
 
 import * as middlewares from "./middlewares.js";
