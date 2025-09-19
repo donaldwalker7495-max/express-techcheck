@@ -12,16 +12,19 @@
   "keywords": [],
   "main": "src/index.js",
   "scripts": {
-    "start": "node --env-file=.env src/index.js",
-    "dev": "node --watch --env-file=.env src/index.js",
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
     "lint": "eslint --fix src",
-    "test": "vitest run"
+    "test": "vitest run --hookTimeout=180000"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "pg": "^8.16.3",
     "swagger-cli-express": "^1.0.1",
     "zod": "^3.25.67"
   },

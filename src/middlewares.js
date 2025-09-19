@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { env } from "./env.js";
 
 export function notFound(req, res, next) {
@@ -13,4 +14,22 @@ export function errorHandler(err, req, res, _next) {
     message: err.message,
     stack: env.NODE_ENV === "production" ? "🥞" : err.stack,
   });
+}
+
+export function authenticateJwt(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401);
+      throw new Error("Missing or invalid Authorization header");
+    }
+    const token = authHeader.substring("Bearer ".length);
+    const payload = jwt.verify(token, env.JWT_SECRET);
+    req.user = payload;
+    next();
+  }
+  catch (err) {
+    res.status(401);
+    next(new Error("Invalid or expired token"));
+  }
 }
