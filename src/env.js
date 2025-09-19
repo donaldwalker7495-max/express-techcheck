@@ -3,6 +3,13 @@ import { z } from "zod/v4";
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.coerce.number().default(3000),
+  JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+  // Optional MySQL settings
+  MYSQL_HOST: z.string().optional(),
+  MYSQL_PORT: z.coerce.number().optional(),
+  MYSQL_USER: z.string().optional(),
+  MYSQL_PASSWORD: z.string().optional(),
+  MYSQL_DATABASE: z.string().optional(),
 });
 
 try {
