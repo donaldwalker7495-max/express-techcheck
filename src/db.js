@@ -27,6 +27,8 @@ export async function query(text, params) {
 
 export async function migrate() {
   await query(`
+    SELECT pg_advisory_lock(424242);
+
     CREATE TABLE IF NOT EXISTS products (
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
@@ -35,6 +37,24 @@ export async function migrate() {
       created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_products_created_at ON products(created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(255) NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS login_attempts (
+      id BIGSERIAL PRIMARY KEY,
+      username VARCHAR(255) NOT NULL,
+      attempt_time TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+      success BOOLEAN NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_login_attempts_username_time ON login_attempts(username, attempt_time DESC);
+
+    SELECT pg_advisory_unlock(424242);
   `);
 }
 

@@ -8,4 +8,20 @@ CREATE TABLE IF NOT EXISTS products (
 
 CREATE INDEX IF NOT EXISTS idx_products_created_at ON products(created_at DESC);
 
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(255) NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
 
+CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS login_attempts (
+  id BIGSERIAL PRIMARY KEY,
+  username VARCHAR(255) NOT NULL,
+  attempt_time TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  success BOOLEAN NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_login_attempts_username_time ON login_attempts(username, attempt_time DESC);
