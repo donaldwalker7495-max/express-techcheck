@@ -8,7 +8,7 @@
 - `price` (number)
 - `created_at` (timestamp)
 
-### Requirements:
+### Requirements
 
 1. **GET** `/api/products`: Retrieve all products.
 2. **GET** `/api/products/:id`: Retrieve a specific product by its ID.
@@ -16,7 +16,7 @@
 4. **PUT** `/api/products/:id`: Update a product’s information.
 5. **DELETE** `/api/products/:id`: Delete a product by its ID.
 
-### Bonus:
+### Bonus
 
 - Add input validation using a library like `express-validator` or `joi`.
 
@@ -30,13 +30,13 @@
 - `username` (string)
 - `password` (string, stored securely)
 
-### Requirements:
+### Requirements
 
 1. **POST** `/api/auth/register`: Register a new user (hash the password before storing).
 2. **POST** `/api/auth/login`: Authenticate a user and return a JWT token upon successful login.
 3. **POST** `/api/auth/protected`: A protected route that requires JWT authorization to access (use middleware to verify the JWT token).
 
-### Bonus:
+### Bonus
 
 - Implement user login rate-limiting (to prevent brute-force attacks).
 
@@ -48,12 +48,14 @@
 
 1. **GET** `/api/products/search`: Accept a `q` query parameter (for example, `/api/products/search?q=laptop`) and return all products whose `name` contains the query string.
 
-### Requirements:
+### Requirements
 
 - The search should be case-insensitive.
 - Use MySQL to perform the search (hint: `LIKE` queries).
 - If no products are found, return a message indicating that no results were found.
 
-### Bonus:
+### Bonus
 
 - Implement pagination for search results (e.g., limit the results to 10 products per page, and use query parameters like `page`).
+
+> Please check my architecture here [Architecture](./architecture.md)
