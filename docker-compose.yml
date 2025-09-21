@@ -1,26 +1,35 @@
-version: '3.9'
+version: "3.9"
 
 services:
   db:
-    image: mysql:8.4
+    image: mysql:8.0
+    restart: always
+    env_file: 
+      - .env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DB}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT}:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./src/db/schema.sql:/docker-entrypoint-initdb.d/0_schema.sql:ro
 
-  api:
+  app:
     build: .
-    env_file: .env
+    command: ["pnpm", "start"]
     depends_on:
       - db
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
     ports:
-      - "3000:3000"
+      - "${PORT}:3000"
+    volumes:
+      - .:/usr/src/app
 
 volumes:
   db_data:
