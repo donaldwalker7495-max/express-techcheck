@@ -51,7 +51,7 @@ These are things I can do to improve the product in the case of full blown produ
 
 ## 🔐 Security
 
-* Use argon2 or bcrypt with salt + rounds
+* Use argon2 or bcrypt with salt
 
 * Refresh tokens & rotation
 
