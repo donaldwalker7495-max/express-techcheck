@@ -39,3 +39,4 @@ export const productSchema = z.object({
 	description: z.string().optional(),
 	price: z.number().positive(),
 });
+

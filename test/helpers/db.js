@@ -1,4 +1,3 @@
-// test/helpers/db.js
 import mysql from "mysql2/promise";
 import { env } from "../../src/env.js";
 
@@ -20,7 +19,7 @@ export async function getDb() {
 export async function resetTables() {
 	const conn = await getDb();
 
-	// Ensure schema exists
+	// Drop and recreate users table
 	await conn.query(`
     CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,7 +27,9 @@ export async function resetTables() {
       password VARCHAR(255) NOT NULL
     )
   `);
+	await conn.query(`TRUNCATE TABLE users`);
 
+	// Drop and recreate products table
 	await conn.query(`
     CREATE TABLE IF NOT EXISTS products (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -37,8 +38,5 @@ export async function resetTables() {
       price DECIMAL(10,2) NOT NULL
     )
   `);
-
-	// Clean up tables before each test
-	await conn.query("TRUNCATE TABLE users");
-	await conn.query("TRUNCATE TABLE products");
+	await conn.query(`TRUNCATE TABLE products`);
 }

@@ -1,7 +1,6 @@
 import { z } from "zod/v4";
 import dotenv from "dotenv";
 
-// Load variables from .env into process.env
 dotenv.config();
 
 const envFile = process.env.NODE_ENV === "test" ? ".env.test" : ".env";
@@ -26,7 +25,6 @@ const envSchema = z.object({
 });
 
 try {
-  // eslint-disable-next-line node/no-process-env
   envSchema.parse(process.env);
 }
 catch (error) {
@@ -39,5 +37,4 @@ catch (error) {
   process.exit();
 }
 
-// eslint-disable-next-line node/no-process-env
 export const env = envSchema.parse(process.env);

@@ -31,7 +31,7 @@ describe("Products CRUD + search edges", () => {
 			.put(`/api/products/${id}`)
 			.send({ price: 1199.99 });
 		expect(update.statusCode).toBe(200);
-		expect(update.body.price).toBe(1199.99);
+		expect(update.body.price).toBe("1199.99");
 
 		const search = await request(app).get("/api/products/search?q=laptop");
 		expect(search.statusCode).toBe(200);

@@ -33,10 +33,10 @@ describe("Auth flow", () => {
 		await request(app).post("/api/auth/register").send({
 			username: "alice",
 			password: "hunter2",
-		});
+    });
 		const res = await request(app).post("/api/auth/login").send({
 			username: "alice",
-			password: "wrong",
+			password: "wrongpassword",
 		});
 		expect(res.statusCode).toBe(401);
 	});

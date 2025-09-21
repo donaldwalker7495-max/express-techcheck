@@ -19,11 +19,17 @@ app.get("/", (req, res) => {
 	res.json({ message: "🦄🌈✨👋🌎🌍🌏✨🌈🦄" });
 });
 
+app.get("/api/v1", (req, res) => {
+	res.json({
+		message: "API - 👋🌎🌍🌏",
+	});
+});
 app.get("/api/v1/emojis", (req, res) => {
-	res.json(["😀", "😳", "🙄"]);
+	const emojis = ["😀", "😳", "🙄"];
+	res.json(emojis);
 });
 
-app.use("/api/v1", router);
+app.use("/api", router);
 
 app.use(notFound);
 app.use(errorHandler);
