@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  postgres:
+    platform: linux/arm64/v8
+    image: postgres:15-alpine
+    container_name: express_api_db
+    environment:
+      POSTGRES_DB: express_api
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d express_api"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
